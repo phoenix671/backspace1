@@ -31,6 +31,28 @@ def get_gemini_client():
 
 
 def get_default_model() -> str:
-    # Allow user override via env var, default to gemini-2.5-flash
-    return os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
+    # Default to gemini-3.1-flash-lite for ultra-fast responses (~1.3s) and highest stability
+    return os.environ.get("GEMINI_MODEL", "gemini-3.1-flash-lite")
+
+
+def generate_with_fallback(client, contents, config=None, models=None):
+    if models is None:
+        primary = get_default_model()
+        candidates = [primary, "gemini-3.1-flash-lite", "gemini-3.5-flash-lite", "gemini-3.6-flash"]
+        seen = set()
+        models = [m for m in candidates if not (m in seen or seen.add(m))]
+
+    last_exc = None
+    for m in models:
+        try:
+            return client.models.generate_content(
+                model=m,
+                contents=contents,
+                config=config,
+            )
+        except Exception as exc:
+            last_exc = exc
+            continue
+
+    raise last_exc
 

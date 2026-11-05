@@ -9,3 +9,6 @@ PyJWT==2.15.1
 bcrypt==5.0.0
 
 httpx==0.28.1
+google-genai>=2.30.0
+pypdf>=6.0.0
+pillow>=13.0.0

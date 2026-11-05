@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 from google.genai import types
 
-from ai.client import get_default_model, get_gemini_client
+from ai.client import generate_with_fallback, get_gemini_client
 from ai.exceptions import AIError
 
 
@@ -134,8 +134,8 @@ def extract_question_from_book(
     }
 
     try:
-        response = client.models.generate_content(
-            model=get_default_model(),
+        response = generate_with_fallback(
+            client,
             contents=prompt,
             config=types.GenerateContentConfig(
                 response_mime_type="application/json",
@@ -226,8 +226,8 @@ def find_pyqs(
             },
         }
         try:
-            resp = client.models.generate_content(
-                model=get_default_model(),
+            resp = generate_with_fallback(
+                client,
                 contents=prompt,
                 config=types.GenerateContentConfig(
                     response_mime_type="application/json",

@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Optional
 
 from google.genai import types
 
-from ai.client import get_default_model, get_gemini_client
+from ai.client import generate_with_fallback, get_gemini_client
 from ai.exceptions import AIError
 
 
@@ -28,8 +28,8 @@ def get_topics_and_formulae(question_text: str, topic: str) -> Dict[str, Any]:
     }
 
     try:
-        response = client.models.generate_content(
-            model=get_default_model(),
+        response = generate_with_fallback(
+            client,
             contents=prompt,
             config=types.GenerateContentConfig(
                 response_mime_type="application/json",
@@ -72,8 +72,8 @@ def simplify_question(question_text: str, topic: str, diagnosis: List[Dict[str, 
     }
 
     try:
-        response = client.models.generate_content(
-            model=get_default_model(),
+        response = generate_with_fallback(
+            client,
             contents=prompt,
             config=types.GenerateContentConfig(
                 response_mime_type="application/json",
@@ -139,8 +139,8 @@ def solve_question(question_text: str, topic: str, diagnosis: Optional[List[Dict
     }
 
     try:
-        response = client.models.generate_content(
-            model=get_default_model(),
+        response = generate_with_fallback(
+            client,
             contents=prompt,
             config=types.GenerateContentConfig(
                 response_mime_type="application/json",
@@ -185,8 +185,8 @@ def generate_question(topic: str, subject: str, mistake_history: Optional[List[D
     }
 
     try:
-        response = client.models.generate_content(
-            model=get_default_model(),
+        response = generate_with_fallback(
+            client,
             contents=prompt,
             config=types.GenerateContentConfig(
                 response_mime_type="application/json",

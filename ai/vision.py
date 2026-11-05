@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Optional
 
 from google.genai import types
 
-from ai.client import get_default_model, get_gemini_client
+from ai.client import generate_with_fallback, get_gemini_client
 from ai.exceptions import AIError
 
 VALID_MISTAKE_TYPES = {"sign_error", "formula_misuse", "unit_slip", "concept_gap"}
@@ -54,8 +54,8 @@ def extract_question_from_image(image_path: str | Path) -> Dict[str, Any]:
     }
 
     try:
-        response = client.models.generate_content(
-            model=get_default_model(),
+        response = generate_with_fallback(
+            client,
             contents=[image_part, prompt],
             config=types.GenerateContentConfig(
                 response_mime_type="application/json",
@@ -150,8 +150,8 @@ def analyze_attempt(
     }
 
     try:
-        response = client.models.generate_content(
-            model=get_default_model(),
+        response = generate_with_fallback(
+            client,
             contents=[image_part, prompt],
             config=types.GenerateContentConfig(
                 response_mime_type="application/json",
