@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Optional
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlalchemy.engine import URL
@@ -19,6 +20,8 @@ class Settings(BaseSettings):
     TEACHER_DOMAIN: str
     STUDENT_DOMAIN: str
     USE_REAL_AI: bool = False
+    GEMINI_API_KEY: Optional[str] = None
+    YOUTUBE_API_KEY: Optional[str] = None
     STORAGE_DIR: str = "storage"
 
     model_config = SettingsConfigDict(env_file=ENV_FILE, extra="ignore")

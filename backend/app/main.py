@@ -1,11 +1,12 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from app.config import settings
 from app.database import Base, engine
 from app.errors import register_error_handlers
-from app.routers import auth, student
+from app.routers import auth, books, faculty, student, teacher
 
 # Create required storage folders before creating the app
 (settings.storage_path / "uploads").mkdir(parents=True, exist_ok=True)
@@ -24,9 +25,20 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="Neura API", lifespan=lifespan)
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 register_error_handlers(app)
 
 app.include_router(auth.router, prefix="/api/v1")
+app.include_router(faculty.router, prefix="/api/v1")
+app.include_router(teacher.router, prefix="/api/v1")
+app.include_router(books.router, prefix="/api/v1")
 app.include_router(student.router, prefix="/api/v1")
 
 app.mount("/files", StaticFiles(directory=settings.storage_path), name="files")
