@@ -312,3 +312,209 @@ def get_topics_and_formulae(question_text, topic):
     formulae = list(FORMULAE.get(topic, ["No standard formula listed"]))
     return {"topics": topics, "formulae": formulae}
 
+
+import copy
+import string
+
+SOLUTION_POOL = [
+    {
+        "steps": [
+            {
+                "step_number": 1,
+                "text": "Identify initial velocity u = 0 m/s, final velocity v = 20 m/s, and time t = 5 s.",
+            },
+            {
+                "step_number": 2,
+                "text": "Use the first equation of motion to calculate acceleration: a = (v - u) / t = (20 - 0) / 5 = 4 m/s^2.",
+            },
+            {
+                "step_number": 3,
+                "text": "Use the second equation of motion for distance: s = ut + (1/2)at^2 = 0 + 0.5 * 4 * (5^2) = 50 m.",
+            },
+        ],
+        "final_answer": "Acceleration is 4 m/s^2 and distance covered is 50 m.",
+        "shortcuts": [
+            {
+                "title": "Average velocity method",
+                "text": "Average velocity = (u + v) / 2 = 10 m/s; distance = average velocity * time = 10 * 5 = 50 m.",
+            }
+        ],
+        "efficient_method": {
+            "title": "Work with average velocity",
+            "steps": [
+                "Find average velocity: (0 + 20) / 2 = 10 m/s.",
+                "Multiply by total time: 10 m/s * 5 s = 50 m.",
+            ],
+        },
+    },
+    {
+        "steps": [
+            {
+                "step_number": 1,
+                "text": "Note given quantities: mass m = 5 kg, force F = 20 N, frictionless surface.",
+            },
+            {
+                "step_number": 2,
+                "text": "Apply Newton's second law: F = m * a.",
+            },
+            {
+                "step_number": 3,
+                "text": "Calculate acceleration: a = F / m = 20 / 5 = 4 m/s^2.",
+            },
+        ],
+        "final_answer": "Acceleration is 4 m/s^2.",
+        "shortcuts": [
+            {
+                "title": "Direct division",
+                "text": "Since surface is smooth, acceleration is directly force divided by mass: a = 20 / 5 = 4 m/s^2.",
+            }
+        ],
+        "efficient_method": {
+            "title": "Direct force-to-mass ratio",
+            "steps": [
+                "Verify no opposing friction forces exist on the smooth surface.",
+                "Divide net force by mass directly: a = 20 N / 5 kg = 4 m/s^2.",
+            ],
+        },
+    },
+    {
+        "steps": [
+            {
+                "step_number": 1,
+                "text": "Identify given quantities: mass m = 3 kg, vertical height h = 4 m, acceleration due to gravity g = 10 m/s^2.",
+            },
+            {
+                "step_number": 2,
+                "text": "Recall gravitational potential energy formula: PE = m * g * h.",
+            },
+            {
+                "step_number": 3,
+                "text": "Calculate potential energy: PE = 3 * 10 * 4 = 120 J.",
+            },
+        ],
+        "final_answer": "Gain in potential energy is 120 J.",
+        "shortcuts": [
+            {
+                "title": "Weight times displacement",
+                "text": "Object weight W = mg = 30 N; Potential Energy = W * h = 30 * 4 = 120 J.",
+            }
+        ],
+        "efficient_method": {
+            "title": "Work done against gravity",
+            "steps": [
+                "Compute weight of the ball: 3 kg * 10 m/s^2 = 30 N.",
+                "Multiply weight by vertical height: 30 N * 4 m = 120 J.",
+            ],
+        },
+    },
+]
+
+GIF_BYTES = bytes.fromhex(
+    "47494638396101000100800000000000ffffff21f90401000000002c00000000010001000002024401003b"
+)
+
+
+@_switchable
+def simplify_question(question_text, topic, diagnosis):
+    n = diagnosis[0]["step_number"] if diagnosis and "step_number" in diagnosis[0] else 1
+    templates = [
+        f"In this {topic} problem, begin by listing all given values with their standard units, and then choose a single formula connecting them.",
+        f"To solve this {topic} question systematically, write down the known and unknown variables first, then select the appropriate governing relation.",
+        f"For this {topic} concept, check step {n} carefully by listing the given quantities and selecting the single formula relating them before solving.",
+    ]
+    return {"simplified_text": random.choice(templates)}
+
+
+@_switchable
+def generate_gif(question_text, simplified_text, out_path):
+    time.sleep(2)
+    if "FAILGIF" in str(question_text):
+        return {"status": "failed", "gif_path": None}
+
+    target = Path(out_path)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_bytes(GIF_BYTES)
+    return {"status": "ready", "gif_path": str(out_path)}
+
+
+@_switchable
+def solve_question(question_text, topic, diagnosis):
+    chosen = random.choice(SOLUTION_POOL)
+    return copy.deepcopy(chosen)
+
+
+@_switchable
+def find_pyqs(topic, subject, n, exclude_question_texts):
+    excl = set(exclude_question_texts or [])
+    t_lower = str(topic).strip().lower()
+    matching = [
+        q for q in QUESTION_POOL
+        if q["topic"].lower() == t_lower and q["text"] not in excl
+    ]
+    random.shuffle(matching)
+    kept = matching[:n]
+    questions = []
+    for q in kept:
+        yr = random.randint(2018, 2024)
+        q_num = random.randint(1, 10)
+        questions.append({
+            "question_text": q["text"],
+            "topic": q["topic"],
+            "subject": "Physics",
+            "book_id": 1,
+            "reference": f"{yr} Q{q_num}",
+        })
+    return {"questions": questions}
+
+
+@_switchable
+def generate_question(topic, subject, mistake_history):
+    t_lower = str(topic).strip().lower()
+    if t_lower == "kinematics":
+        u = random.randint(5, 25)
+        v = u + random.randint(10, 30)
+        t = random.randint(2, 10)
+        text = f"An automobile accelerates uniformly from {u} m/s to {v} m/s in {t} s. Determine the acceleration and distance covered during this period."
+    elif t_lower == "newton's laws of motion":
+        m = random.randint(2, 15)
+        f = random.randint(10, 80)
+        text = f"A block of mass {m} kg rests on a frictionless horizontal plane and is pulled by a constant force of {f} N. Compute the resulting acceleration."
+    elif t_lower == "work, energy and power":
+        m = random.randint(2, 20)
+        h = random.randint(3, 15)
+        text = f"An object of mass {m} kg is raised to a vertical height of {h} m above the ground. Calculate the increase in its gravitational potential energy (take g = 10 m/s^2)."
+    else:
+        text = f"Explain one real-life example of {topic} and solve a simple numerical problem on it."
+
+    return {
+        "question_text": text,
+        "topic": topic,
+        "subject": subject,
+    }
+
+
+@_switchable
+def find_videos(topic, question_text):
+    channels = ["Example Physics Channel", "Demo Science Academy"]
+    chars = string.ascii_letters + string.digits
+    vid_id1 = "".join(random.choices(chars, k=11))
+    vid_id2 = "".join(random.choices(chars, k=11))
+    title_q = str(question_text)[:40]
+
+    videos = [
+        {
+            "title": f"Complete guide to {topic}",
+            "url": f"https://www.youtube.com/watch?v={vid_id1}",
+            "channel": random.choice(channels),
+            "kind": "topic_explainer",
+        },
+        {
+            "title": f"Step-by-step solution: {title_q}",
+            "url": f"https://www.youtube.com/watch?v={vid_id2}",
+            "channel": random.choice(channels),
+            "kind": "question_solution",
+        },
+    ]
+    return {"videos": videos}
+
+
