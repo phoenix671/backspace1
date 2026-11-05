@@ -110,3 +110,20 @@ def login(email, password):
     return _request("POST", "/auth/login", json={"email": email, "password": password})
 
 
+def get_me():
+    if config.is_mock("E2"):
+        token = st.session_state.get("token")
+        if not token or not token.startswith("mock-token-"):
+            raise ApiError(401, "unauthorized", "Missing or invalid token.")
+        try:
+            user_id = int(token[len("mock-token-"):])
+        except ValueError:
+            raise ApiError(401, "unauthorized", "Missing or invalid token.")
+        for user in _MOCK_USERS.values():
+            if user["id"] == user_id:
+                return dict(user)
+        raise ApiError(401, "unauthorized", "Missing or invalid token.")
+    return _request("GET", "/auth/me")
+
+
+
