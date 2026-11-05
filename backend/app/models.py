@@ -65,3 +65,31 @@ class Book(Base):
     error: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
 
+class Question(Base):
+    __tablename__ = "questions"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    text: Mapped[str] = mapped_column(Text)
+    topic: Mapped[str] = mapped_column(String(200))
+    subject: Mapped[str] = mapped_column(String(100))
+    image_path: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
+    source_book_id: Mapped[Optional[int]] = mapped_column(ForeignKey("books.id"), nullable=True)
+    reference: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+
+
+class Homework(Base):
+    __tablename__ = "homework"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    class_id: Mapped[int] = mapped_column(ForeignKey("classes.id"))
+    teacher_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    book_id: Mapped[int] = mapped_column(ForeignKey("books.id"))
+    chapter: Mapped[Optional[str]] = mapped_column(String(200), nullable=True)
+    question_ref: Mapped[str] = mapped_column(String(200))
+    question_id: Mapped[int] = mapped_column(ForeignKey("questions.id"))
+    title: Mapped[Optional[str]] = mapped_column(String(200), nullable=True)
+    assigned_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
+    due_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+
+
+
