@@ -35,6 +35,15 @@ class Settings(BaseSettings):
             query={"charset": "utf8mb4"},
         )
 
+    @property
+    def storage_path(self) -> Path:
+        return Path(__file__).resolve().parent.parent / self.STORAGE_DIR
+
+    @property
+    def private_books_path(self) -> Path:
+        return Path(__file__).resolve().parent.parent / "private_storage" / "books"
+
+
 
 settings = Settings()
 

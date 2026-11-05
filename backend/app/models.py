@@ -92,4 +92,57 @@ class Homework(Base):
     due_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
 
 
+class SolveSession(Base):
+    __tablename__ = "sessions"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    student_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    question_id: Mapped[int] = mapped_column(ForeignKey("questions.id"))
+    source: Mapped[str] = mapped_column(String(30))
+    status: Mapped[str] = mapped_column(String(30), default="awaiting_attempt")
+    homework_id: Mapped[Optional[int]] = mapped_column(ForeignKey("homework.id"), nullable=True)
+    followup_of: Mapped[Optional[int]] = mapped_column(ForeignKey("sessions.id"), nullable=True)
+    followup_index: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    attempts_used: Mapped[int] = mapped_column(Integer, default=0)
+    gif_status: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
+    gif_path: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
+
+
+class Attempt(Base):
+    __tablename__ = "attempts"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    session_id: Mapped[int] = mapped_column(ForeignKey("sessions.id"))
+    trial_number: Mapped[int] = mapped_column(Integer)
+    image_path: Mapped[str] = mapped_column(String(500))
+    verdict: Mapped[str] = mapped_column(String(20))
+    stage: Mapped[str] = mapped_column(String(20))
+    submitted_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
+
+
+class MistakeHistory(Base):
+    __tablename__ = "mistake_history"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    student_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    session_id: Mapped[int] = mapped_column(ForeignKey("sessions.id"))
+    attempt_id: Mapped[int] = mapped_column(ForeignKey("attempts.id"))
+    question_id: Mapped[int] = mapped_column(ForeignKey("questions.id"))
+    topic: Mapped[str] = mapped_column(String(200))
+    subject: Mapped[str] = mapped_column(String(100))
+    mistake_type: Mapped[str] = mapped_column(String(30))
+    step_number: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    description: Mapped[str] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
+
+
+class VideoCache(Base):
+    __tablename__ = "video_cache"
+
+    question_id: Mapped[int] = mapped_column(ForeignKey("questions.id"), primary_key=True)
+    videos_json: Mapped[str] = mapped_column(Text)
+
+
+
 
