@@ -5,7 +5,7 @@ from fastapi.staticfiles import StaticFiles
 from app.config import settings
 from app.database import Base, engine
 from app.errors import register_error_handlers
-from app.routers import auth
+from app.routers import auth, student
 
 # Create required storage folders before creating the app
 (settings.storage_path / "uploads").mkdir(parents=True, exist_ok=True)
@@ -27,6 +27,7 @@ app = FastAPI(title="Neura API", lifespan=lifespan)
 register_error_handlers(app)
 
 app.include_router(auth.router, prefix="/api/v1")
+app.include_router(student.router, prefix="/api/v1")
 
 app.mount("/files", StaticFiles(directory=settings.storage_path), name="files")
 
