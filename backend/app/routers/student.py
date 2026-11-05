@@ -524,7 +524,7 @@ def create_followups(
             topic=item["topic"],
             subject=item["subject"],
             image_path=None,
-            source_book_id=item["book_id"],
+            source_book_id=item["book_id"] if (item.get("book_id") is not None and db.get(Book, item["book_id"]) is not None) else None,
             reference=item["reference"],
         )
         db.add(q)

@@ -12,36 +12,36 @@ FILES_BASE_URL = os.getenv("FILES_BASE_URL", "http://localhost:8000")
 SUBJECTS = ["Mathematics", "Physics", "Chemistry", "Biology"]
 
 USE_MOCK = {
-    "E1": True,
-    "E2": True,
-    "E3": True,
-    "E4": True,
-    "E5": True,
-    "E6": True,
-    "E7": True,
-    "E8": True,
-    "E9": True,
-    "E10": True,
-    "E11": True,
-    "E12": True,
-    "E13": True,
-    "E14": True,
-    "E15": True,
-    "E16": True,
-    "E17": True,
-    "E18": True,
-    "E19": True,
-    "E20": True,
-    "E21": True,
-    "E22": True,
-    "E23": True,
-    "E24": True,
-    "E25": True,
-    "E26": True,
-    "E27": True,
-    "E28": True,
-    "E29": True,
-    "E30": True,
+    "E1": False,
+    "E2": False,
+    "E3": False,
+    "E4": False,
+    "E5": False,
+    "E6": False,
+    "E7": False,
+    "E8": False,
+    "E9": False,
+    "E10": False,
+    "E11": False,
+    "E12": False,
+    "E13": False,
+    "E14": False,
+    "E15": False,
+    "E16": False,
+    "E17": False,
+    "E18": False,
+    "E19": False,
+    "E20": False,
+    "E21": False,
+    "E22": False,
+    "E23": False,
+    "E24": False,
+    "E25": False,
+    "E26": False,
+    "E27": False,
+    "E28": False,
+    "E29": False,
+    "E30": False,
 }
 
 # Request timeout in seconds per endpoint, from API contract v0.2.
@@ -57,12 +57,11 @@ TIMEOUTS = {
 
 
 def is_mock(endpoint_id):
-    return USE_MOCK.get(endpoint_id, True)
+    return USE_MOCK.get(endpoint_id, False)
 
 
 def get_timeout(endpoint_id):
     return TIMEOUTS.get(endpoint_id, TIMEOUTS["default"])
-
 
 
 def file_url(path):
@@ -71,4 +70,3 @@ def file_url(path):
     if path.startswith("/"):
         return FILES_BASE_URL.rstrip("/") + path
     return FILES_BASE_URL.rstrip("/") + "/" + path
-

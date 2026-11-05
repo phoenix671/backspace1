@@ -6,6 +6,7 @@ from fastapi.responses import FileResponse
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
+from app.config import settings
 from app.database import get_db
 from app.errors import ApiError
 from app.models import Book, ClassSubjectTeacher, Teacher, User
@@ -129,11 +130,14 @@ def get_book_file(
 
     file_path = Path(b.file_path)
     if not file_path.exists():
-        raise ApiError(404, "not_found", "Book file not found on disk")
+        candidate = settings.private_books_path / b.file_path
+        if candidate.exists():
+            file_path = candidate
+        else:
+            raise ApiError(404, "not_found", "Book file not found on disk")
 
     return FileResponse(
         path=str(file_path),
         media_type="application/pdf",
         filename=f"{b.name}.pdf",
     )
-

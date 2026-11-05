@@ -74,9 +74,30 @@ if ok and data:
                         spinner="Checking status...",
                     )
                     if ok_b:
-                        st.info(f"Status: {b_info['status']}")
+                        msg = f"Status: {b_info['status']}"
+                        if b_info.get("error"):
+                            msg += f" ({b_info['error']})"
+                        st.info(msg)
             with c3:
-                pdf_url = api_client.get_book_file_url(bid)
-                st.markdown(f"[Open PDF]({pdf_url})")
+                pdf_key = f"pdf_bytes_{bid}"
+                if pdf_key not in st.session_state:
+                    if st.button("Load PDF", key=f"load_pdf_f_{bid}", use_container_width=True):
+                        ok_pdf, pdf_bytes = auth.safe_call(
+                            api_client.get_book_file,
+                            bid,
+                            spinner="Fetching PDF...",
+                        )
+                        if ok_pdf and pdf_bytes:
+                            st.session_state[pdf_key] = pdf_bytes
+                            st.rerun()
+                else:
+                    st.download_button(
+                        "Download PDF",
+                        data=st.session_state[pdf_key],
+                        file_name=f"{b['name']}.pdf",
+                        mime="application/pdf",
+                        key=f"dl_pdf_f_{bid}",
+                        use_container_width=True,
+                    )
 
 st.page_link("pages/faculty/home.py", label="Back to Faculty home")

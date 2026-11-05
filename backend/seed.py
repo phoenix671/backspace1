@@ -1,7 +1,12 @@
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+import sys
 from sqlalchemy import select
 from sqlalchemy.orm import Session
+
+_REPO_ROOT = Path(__file__).resolve().parent.parent
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
 
 from app.config import settings
 from app.database import Base, SessionLocal, engine
@@ -18,9 +23,12 @@ from app.models import (
 from app.security import generate_initial_password, hash_password
 
 
-def create_minimal_pdf(file_path: Path, text: str = "Neura sample Physics PYQs") -> None:
+def create_minimal_pdf(
+    file_path: Path,
+    text: str = "Exercise 1.1 Q1: A car accelerates uniformly from rest to 20 m/s in 5 s. Find its acceleration and the distance it covers.",
+) -> None:
     file_path.parent.mkdir(parents=True, exist_ok=True)
-    content = f"BT /F1 24 Tf 100 700 Td ({text}) Tj ET"
+    content = f"BT /F1 14 Tf 50 700 Td ({text}) Tj ET"
     stream_len = len(content)
 
     body: list[bytes] = [b"%PDF-1.4\n"]
@@ -168,7 +176,7 @@ def run_seed() -> list[dict[str, str]]:
 
         # 1 Sample PDF
         pdf_path = settings.private_books_path / "seed_physics_pyqs.pdf"
-        create_minimal_pdf(pdf_path, text="Neura sample Physics PYQs")
+        create_minimal_pdf(pdf_path)
 
         # 1 Book
         book = db.scalar(select(Book).where(Book.name == "Physics Class 10 PYQs"))
@@ -177,7 +185,7 @@ def run_seed() -> list[dict[str, str]]:
                 name="Physics Class 10 PYQs",
                 type="pyq",
                 subject="Physics",
-                file_path="seed_physics_pyqs.pdf",
+                file_path=str(pdf_path),
                 status="ready",
                 page_count=1,
                 error=None,
@@ -187,11 +195,18 @@ def run_seed() -> list[dict[str, str]]:
         else:
             book.type = "pyq"
             book.subject = "Physics"
-            book.file_path = "seed_physics_pyqs.pdf"
+            book.file_path = str(pdf_path)
             book.status = "ready"
             book.page_count = 1
             book.error = None
             db.flush()
+
+        try:
+            from ai.rag import ingest_book
+
+            ingest_book(book.id, str(pdf_path), book.name, book.subject, book.type)
+        except Exception:
+            pass
 
         # 1 Question
         q_text = "A car accelerates uniformly from rest to 20 m/s in 5 s. Find its acceleration and the distance it covers."
@@ -253,4 +268,3 @@ if __name__ == "__main__":
         print(f"{c['role']:<10} {c['name']:<16} {c['email']:<35} {c['password']:<10}")
     print()
     print("Passwords are reset every time you run this script. Save this table.")
-

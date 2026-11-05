@@ -1,7 +1,6 @@
 import streamlit as st
 import auth
 import api_client
-import config
 import theme
 
 theme.apply_theme()
@@ -33,12 +32,3 @@ with middle:
                     st.error(e.message)
             if ok:
                 st.rerun()
-
-    if config.is_mock("E1"):
-        with st.expander("Demo accounts (mock mode)"):
-            st.write(
-                "- `asha.r@student.class.com` (password: `mock1234`)\n"
-                "- `kiran.s@student.class.com` (password: `mock1234`)\n"
-                "- `ravi.k@teacher.class.com` (password: `mock1234`)\n"
-                "- `admin@faculty.class.com` (password: `mock1234`)"
-            )
