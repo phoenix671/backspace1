@@ -37,3 +37,18 @@ def handle_api_error(err):
     else:
         st.error(err.message)
 
+
+def safe_call(fn, *args, spinner=None, **kwargs):
+    """Use this for every api_client call from a page. Example: ok, data = auth.safe_call(api_client.get_me, spinner='Loading...')"""
+    try:
+        if spinner:
+            with st.spinner(spinner):
+                result = fn(*args, **kwargs)
+        else:
+            result = fn(*args, **kwargs)
+        return (True, result)
+    except api_client.ApiError as e:
+        handle_api_error(e)
+        return (False, None)
+
+

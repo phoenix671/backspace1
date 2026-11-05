@@ -8,6 +8,9 @@ load_dotenv(Path(__file__).parent / ".env")
 API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8000/api/v1")
 FILES_BASE_URL = os.getenv("FILES_BASE_URL", "http://localhost:8000")
 
+# Fixed subject list from API contract v0.2 section 0. Use st.selectbox(options=SUBJECTS) everywhere a subject is entered.
+SUBJECTS = ["Mathematics", "Physics", "Chemistry", "Biology"]
+
 USE_MOCK = {
     "E1": True,
     "E2": True,
@@ -41,9 +44,25 @@ USE_MOCK = {
     "E30": True,
 }
 
+# Request timeout in seconds per endpoint, from API contract v0.2.
+TIMEOUTS = {
+    "default": 15,
+    "E3": 60,
+    "E5": 60,
+    "E7": 60,
+    "E19": 30,
+    "E24": 30,
+    "E27": 20,
+}
+
 
 def is_mock(endpoint_id):
     return USE_MOCK.get(endpoint_id, True)
+
+
+def get_timeout(endpoint_id):
+    return TIMEOUTS.get(endpoint_id, TIMEOUTS["default"])
+
 
 
 def file_url(path):
