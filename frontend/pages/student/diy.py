@@ -1,8 +1,10 @@
+import importlib
 import streamlit as st
 import auth
 import theme
 
-theme.apply_theme()
+importlib.reload(theme)
+theme.apply_student_theme()
 
 if auth.current_role() != "student":
     st.error("You are not allowed to view this page.")

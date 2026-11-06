@@ -16,6 +16,7 @@ else:
             st.Page("pages/student/home.py", title="Home", default=True),
             st.Page("pages/student/homework.py", title="View homework"),
             st.Page("pages/student/diy.py", title="DIY"),
+            st.Page("pages/student/flashcards.py", title="Physics flash cards"),
             st.Page("pages/student/pyq.py", title="PYQ's"),
             st.Page("pages/student/upload_question.py", title="Upload a question"),
             st.Page("pages/student/solve.py", title="Solve", visibility="hidden"),

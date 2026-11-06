@@ -3,7 +3,7 @@ import auth
 import theme
 import api_client
 
-theme.apply_theme()
+theme.apply_faculty_theme()
 
 if auth.current_role() != "faculty":
     st.error("You are not allowed to view this page.")
